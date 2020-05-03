@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Data;
 
-namespace apsys.ndbunit.core
+namespace apsys.ndbunit.netcore
 {
     public interface INDbUnit
     {

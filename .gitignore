@@ -2,3 +2,14 @@
 /src/apsys.ndbunit.netcore/bin
 /src/apsys.ndbunit.netcore/obj
 /src/apsys.ndbunit.netcore/*.user
+/src/apsys.ndbunit.netcore.mysql/bin
+/src/apsys.ndbunit.netcore.mysql/obj
+/src/apsys.ndbunit.netcore.mysql.tests/bin
+/src/apsys.ndbunit.netcore.mysql.tests/obj
+/src/apsys.ndbunit.netcore.sqlserver/bin
+/src/apsys.ndbunit.netcore.sqlserver/obj
+/src/apsys.ndbunit.netcore.sqlserver.tests/bin
+/src/apsys.ndbunit.netcore.sqlserver.tests/obj
+/src/apsys.ndbunit.netcore.tests/bin
+/src/apsys.ndbunit.netcore.tests/obj
+/src/apsys.ndbunit.netcore.tests/*.user

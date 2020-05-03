@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.Common;
 
-namespace apsys.ndbunit.core
+namespace apsys.ndbunit.netcore
 {
 
     /// <summary>
