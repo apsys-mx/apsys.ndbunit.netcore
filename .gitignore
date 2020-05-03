@@ -1,0 +1,4 @@
+/src/.vs
+/src/apsys.ndbunit.netcore/bin
+/src/apsys.ndbunit.netcore/obj
+/src/apsys.ndbunit.netcore/*.user
