@@ -81,14 +81,16 @@ namespace apsys.ndbunit.netcore
                     foreach (DataTable dataTable in this.DataSet.Tables)
                     {
                         var cmd = cnn.CreateCommand();
+                        cmd.Transaction = transaction;
                         cmd.CommandText = $"DELETE FROM {dataTable.TableName}";
                         cmd.Connection = cnn;
                         cmd.ExecuteNonQuery();
                     }
                     transaction.Commit();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex);
                     transaction.Rollback();
                 }
             }
@@ -99,7 +101,7 @@ namespace apsys.ndbunit.netcore
         /// Creates a DbConnection
         /// </summary>
         /// <returns></returns>
-        protected abstract DbConnection CreateConnection();
+        public abstract DbConnection CreateConnection();
 
         /// <summary>
         /// Enable datatable's constraints

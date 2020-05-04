@@ -22,7 +22,7 @@ namespace apsys.ndbunit.netcore.mysql
         /// Creates the connection to the database
         /// </summary>
         /// <returns></returns>
-        protected override DbConnection CreateConnection() => new MySqlConnection(this.ConnectionString);
+        public override DbConnection CreateConnection() => new MySqlConnection(this.ConnectionString);
 
         protected override void DisableTableConstraints(IDbTransaction dbTransaction)
         {
