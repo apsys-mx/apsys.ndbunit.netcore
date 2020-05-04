@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
@@ -11,6 +12,20 @@ namespace apsys.ndbunit.netcore.tests
     {
 
         public T ClassUnderTest { get; private set; }
+
+        /// <summary>
+        /// Create the class under test
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="connectionString"></param>
+        /// <returns></returns>
+        protected abstract T CreateClassUnderTest(DataSet schema, string connectionString);
+
+        /// <summary>
+        /// Get the connection string 
+        /// </summary>
+        /// <returns></returns>
+        protected internal abstract string GetConnectionString();
 
         /// <summary>
         /// Setup
@@ -32,9 +47,12 @@ namespace apsys.ndbunit.netcore.tests
         }
 
         [TestCase("Address", 450)]
+        //[TestCase("Customer", 800)]
         public void GetDatabase_ReadAllTables_TablesFoundWithRecords(string tableName, int expectedRowCount)
         {
-            LoadAddressTable();
+            var cnn = this.ClassUnderTest.CreateConnection();
+            LoadAddressTable(cnn);
+
             DataSet dataSet = this.ClassUnderTest.GetDataSetFromDb();
             DataTable dataTable = dataSet.Tables[tableName];
             Assert.IsNotNull(dataTable);
@@ -42,56 +60,47 @@ namespace apsys.ndbunit.netcore.tests
         }
 
         /// <summary>
-        /// Create the class under test
+        /// Load the address table
         /// </summary>
-        /// <param name="schema"></param>
-        /// <param name="connectionString"></param>
-        /// <returns></returns>
-        protected abstract T CreateClassUnderTest(DataSet schema, string connectionString);
+        private void LoadAddressTable(DbConnection cnn)
+        {
+            AdventureWorksSchema awDataset = new AdventureWorksSchema();
+
+            var factory = DbProviderFactories.GetFactory(cnn);
+            DbDataAdapter adapter = factory.CreateDataAdapter();
+            adapter.SelectCommand = factory.CreateCommand();
+            adapter.SelectCommand.CommandText = "SELECT * FROM Address";
+            adapter.SelectCommand.Connection = cnn;
+            DbCommandBuilder commandBuilder = factory.CreateCommandBuilder();
+            commandBuilder.DataAdapter = adapter;
+            commandBuilder.GetInsertCommand();
+
+            this.LoadAddressDataRows(awDataset);
+
+            adapter.Update(awDataset, "Address");
+        }
+
+        private void LoadAddressDataRows(AdventureWorksSchema schema)
+        {
+            foreach (var addressLine in this.GetTextFileLines("Address.txt"))
+            {
+                string[] allAddressColumns = addressLine.Split('|');
+                var addressId = int.Parse(allAddressColumns[0]);
+                var dataRow = schema.Address.Rows.Add(addressId, allAddressColumns[1], allAddressColumns[2], allAddressColumns[3], allAddressColumns[4], allAddressColumns[5], allAddressColumns[6], DateTime.Parse(allAddressColumns[7].ToString()).ToString("yyyy-MM-dd H:mm:ss"));
+            }
+        }
 
         /// <summary>
-        /// Get the connection string 
+        /// Get all lines in a text file
         /// </summary>
+        /// <param name="fileName"></param>
         /// <returns></returns>
-        protected internal abstract string GetConnectionString();
-
-
-        private void LoadAddressTable()
+        private IEnumerable<string> GetTextFileLines(string fileName)
         {
-            using var cnn = this.ClassUnderTest.CreateConnection();
-            cnn.Open();
-
-            using var trx = cnn.BeginTransaction();
             var location = new Uri(Assembly.GetExecutingAssembly().CodeBase);
-            var rootDir =  new FileInfo(location.AbsolutePath).Directory;
-            var filePath = Path.Combine(rootDir.FullName, "data", "Address.txt");
-            var allAddressLines = File.ReadLines(filePath);
-
-            try
-            {
-                foreach (var addressLine in allAddressLines)
-                {
-                    string[] parameters = addressLine.Split('|');
-                    var addressId = int.Parse(parameters[0]);
-                    DbCommand insertCommand = cnn.CreateCommand();
-                    insertCommand.Transaction = trx;
-                    insertCommand.CommandType = CommandType.Text;
-                    insertCommand.CommandText =
-                        "INSERT INTO ADDRESS" +
-                        "(AddressID, AddressLine1, AddressLine2, City, StateProvince, CountryRegion, PostalCode, ModifiedDate)" +
-                        "VALUES" +
-                        $"({addressId}, '{"AddressLine1"}', '{"AddressLine2"}', '{"City"}', '{"StateProvince"}', '{"CountryRegion"}', '{"PostalCode"}', '{DateTime.Now.ToString("yyyy-MM-dd H:mm:ss")}')";
-
-                    insertCommand.ExecuteNonQuery();
-                }
-                trx.Commit();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                trx.Rollback();
-            }
-            cnn.Close();
+            var rootDir = new FileInfo(location.AbsolutePath).Directory;
+            var filePath = Path.Combine(rootDir.FullName, "data", fileName);
+            return File.ReadLines(filePath);
         }
     }
 }
