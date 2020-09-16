@@ -7,10 +7,15 @@ pool:
 variables:
   solution: 'src/apsys.ndbunit.netcore.sln'
   buildPlatform: 'Any CPU'
-  buildConfiguration: 'Debug'
+  buildConfiguration: ''
 
 steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: '$(solution)'
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'src/apsys.ndbunit.netcore/apsys.ndbunit.netcore.csproj'
+    versioningScheme: 'byBuildNumber'
