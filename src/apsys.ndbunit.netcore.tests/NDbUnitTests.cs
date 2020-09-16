@@ -43,39 +43,64 @@ namespace apsys.ndbunit.netcore.tests
         public void GetDatabase_ReadAllTables_TablesCountCorrect()
         {
             DataSet dataSet = this.ClassUnderTest.GetDataSetFromDb();
-            Assert.That(dataSet.Tables.Count, Is.EqualTo(1));
+            Assert.That(dataSet.Tables.Count, Is.EqualTo(2));
         }
 
-        [TestCase("Address", 450)]
-        //[TestCase("Customer", 800)]
-        public void GetDatabase_ReadAllTables_TablesFoundWithRecords(string tableName, int expectedRowCount)
+        [Test]
+        public void GetDatabase_ReadAllTables_TablesFoundWithRecords()
         {
             var cnn = this.ClassUnderTest.CreateConnection();
-            LoadAddressTable(cnn);
+            LoadAddressTable(cnn, this.LoadAddressDataRows, "SELECT * FROM Address");
+            LoadCustomersTable(cnn, this.LoadCustomerDataRows, "SELECT * FROM Customer");
 
             DataSet dataSet = this.ClassUnderTest.GetDataSetFromDb();
-            DataTable dataTable = dataSet.Tables[tableName];
-            Assert.IsNotNull(dataTable);
-            Assert.That(dataTable.Rows.Count, Is.EqualTo(expectedRowCount));
+            DataTable addressDataTable = dataSet.Tables["Address"];
+            Assert.IsNotNull(addressDataTable, $"No Address table found in the dataset");
+            Assert.That(addressDataTable.Rows.Count, Is.EqualTo(450));
+
+            DataTable customerDataTable = dataSet.Tables["Customer"];
+            Assert.IsNotNull(customerDataTable, $"No Customer table found in the dataset");
+            Assert.That(customerDataTable.Rows.Count, Is.EqualTo(847));
         }
 
         /// <summary>
         /// Load the address table
         /// </summary>
-        private void LoadAddressTable(DbConnection cnn)
+        private void LoadCustomersTable(DbConnection cnn, Action<AdventureWorksSchema> loadCustomers, string selectCommandText)
         {
             AdventureWorksSchema awDataset = new AdventureWorksSchema();
 
             var factory = DbProviderFactories.GetFactory(cnn);
             DbDataAdapter adapter = factory.CreateDataAdapter();
             adapter.SelectCommand = factory.CreateCommand();
-            adapter.SelectCommand.CommandText = "SELECT * FROM Address";
+            adapter.SelectCommand.CommandText = selectCommandText;
             adapter.SelectCommand.Connection = cnn;
             DbCommandBuilder commandBuilder = factory.CreateCommandBuilder();
             commandBuilder.DataAdapter = adapter;
             commandBuilder.GetInsertCommand();
 
-            this.LoadAddressDataRows(awDataset);
+            loadCustomers(awDataset);
+
+            adapter.Update(awDataset, "Customer");
+        }
+
+        /// <summary>
+        /// Load the address table
+        /// </summary>
+        private void LoadAddressTable(DbConnection cnn, Action<AdventureWorksSchema> loadAddressRows, string selectCommandText)
+        {
+            AdventureWorksSchema awDataset = new AdventureWorksSchema();
+
+            var factory = DbProviderFactories.GetFactory(cnn);
+            DbDataAdapter adapter = factory.CreateDataAdapter();
+            adapter.SelectCommand = factory.CreateCommand();
+            adapter.SelectCommand.CommandText = selectCommandText;
+            adapter.SelectCommand.Connection = cnn;
+            DbCommandBuilder commandBuilder = factory.CreateCommandBuilder();
+            commandBuilder.DataAdapter = adapter;
+            commandBuilder.GetInsertCommand();
+
+            loadAddressRows(awDataset);
 
             adapter.Update(awDataset, "Address");
         }
@@ -86,7 +111,32 @@ namespace apsys.ndbunit.netcore.tests
             {
                 string[] allAddressColumns = addressLine.Split('|');
                 var addressId = int.Parse(allAddressColumns[0]);
-                var dataRow = schema.Address.Rows.Add(addressId, allAddressColumns[1], allAddressColumns[2], allAddressColumns[3], allAddressColumns[4], allAddressColumns[5], allAddressColumns[6], DateTime.Parse(allAddressColumns[7].ToString()).ToString("yyyy-MM-dd H:mm:ss"));
+                schema.Address.Rows.Add(addressId, allAddressColumns[1], allAddressColumns[2], allAddressColumns[3], allAddressColumns[4], allAddressColumns[5], allAddressColumns[6], DateTime.Parse(allAddressColumns[7].ToString()).ToString("yyyy-MM-dd H:mm:ss"));
+            }
+        }
+
+        private void LoadCustomerDataRows(AdventureWorksSchema schema)
+        {
+            foreach (var customerLine in this.GetTextFileLines("Customer.txt"))
+            {
+                string[] allCustomerColumns = customerLine.Split('|');
+                var customerId = int.Parse(allCustomerColumns[0]);
+                schema.Customer.Rows.Add(
+                    customerId, 
+                    false, 
+                    allCustomerColumns[2], 
+                    allCustomerColumns[3], 
+                    allCustomerColumns[4], 
+                    allCustomerColumns[5], 
+                    allCustomerColumns[6], 
+                    allCustomerColumns[7],
+                    allCustomerColumns[8],
+                    allCustomerColumns[9],
+                    allCustomerColumns[10],
+                    allCustomerColumns[11],
+                    allCustomerColumns[12],
+                    //allCustomerColumns[13],
+                    DateTime.Parse(allCustomerColumns[14].ToString()).ToString("yyyy-MM-dd H:mm:ss"));
             }
         }
 
