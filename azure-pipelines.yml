@@ -14,11 +14,15 @@ steps:
   inputs:
     command: 'build'
     projects: '$(solution)'
-
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
   inputs:
     command: 'pack'
-    packagesToPack: '$(solution)'
-    nobuild: true
+    packagesToPack: 'src/apsys.ndbunit.netcore/apsys.ndbunit.netcore.csproj'
     versioningScheme: 'off'
-    buildProperties: '-p:PackageVersion=2.1.0'
+    includeReferencedProjects: true
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'apsys nuget server'
