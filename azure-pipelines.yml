@@ -8,6 +8,7 @@ variables:
   solution: 'src/apsys.ndbunit.netcore.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: ''
+  buildN: '3'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -21,4 +22,4 @@ steps:
     packagesToPack: 'src/apsys.ndbunit.netcore'
     nobuild: true
     versioningScheme: 'off'
-    buildProperties: 'PackageVersion=2.1.0'
+    buildProperties: 'PackageVersion=2020.19.$(Build.BuildNumber)'
