@@ -1,0 +1,33 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: 'src/apsys.ndbunit.netcore.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: ''
+  buildN: '3'
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'src/apsys.ndbunit.netcore'
+    nobuild: true
+    versioningScheme: 'off'
+    buildProperties: 'PackageVersion=$(Build.BuildNumber)'
+    verbosityPack: 'Minimal'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'apsys nuget server'
