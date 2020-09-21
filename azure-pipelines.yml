@@ -22,4 +22,5 @@ steps:
     packagesToPack: 'src/apsys.ndbunit.netcore'
     nobuild: true
     versioningScheme: 'off'
-    buildProperties: 'PackageVersion=2020.19.$(Build.BuildNumber)'
+    buildProperties: 'PackageVersion=$(Build.BuildNumber)'
+    verbosityPack: 'Minimal'
