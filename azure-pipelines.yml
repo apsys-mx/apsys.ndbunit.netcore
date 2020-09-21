@@ -21,4 +21,3 @@ steps:
     packagesToPack: 'src/apsys.ndbunit.netcore'
     nobuild: true
     versioningScheme: 'off'
-    buildProperties: '-p:PackageVersion=2.1.0'
