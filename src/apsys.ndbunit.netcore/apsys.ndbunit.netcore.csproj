@@ -4,9 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>apsys.ndbunit.netcore</PackageId>
     <Version>1.0.0</Version>
-    <Authors>oscar.sanchez</Authors>
+    <Authors>APSYS MX</Authors>
     <Company>APSYS MX</Company>
-    <Description>Nuget description</Description>
+    <Description>NDbUnit is a .NET Core library for managing database state during unit testing</Description>
 </PropertyGroup>
 
 </Project>

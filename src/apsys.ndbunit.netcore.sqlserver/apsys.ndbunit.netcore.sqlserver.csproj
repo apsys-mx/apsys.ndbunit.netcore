@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageId>apsys.ndbunit.netcore.sqlserver</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>APSYS MX</Authors>
+    <Company>APSYS MX</Company>
+    <Description>Implementation of NDbUnit for Microsoft SQL Server</Description>
+
   </PropertyGroup>
 
   <ItemGroup>

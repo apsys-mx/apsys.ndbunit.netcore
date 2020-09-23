@@ -25,6 +25,15 @@ steps:
     buildProperties: 'PackageVersion=$(Build.BuildNumber)'
     verbosityPack: 'Minimal'
 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'src/apsys.ndbunit.netcore.sqlserver'
+    nobuild: true
+    versioningScheme: 'off'
+    buildProperties: 'PackageVersion=$(Build.BuildNumber)'
+    verbosityPack: 'Minimal'
+
 - task: NuGetCommand@2
   inputs:
     command: 'push'
