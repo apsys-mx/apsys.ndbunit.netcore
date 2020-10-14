@@ -79,6 +79,9 @@ namespace apsys.ndbunit.netcore
                 try
                 {
                     foreach (DataTable dataTable in this.DataSet.Tables)
+                        this.DisableTableConstraints(transaction, dataTable);
+
+                    foreach (DataTable dataTable in this.DataSet.Tables)
                     {
                         var cmd = cnn.CreateCommand();
                         cmd.Transaction = transaction;
@@ -86,12 +89,16 @@ namespace apsys.ndbunit.netcore
                         cmd.Connection = cnn;
                         cmd.ExecuteNonQuery();
                     }
+
+                    foreach (DataTable dataTable in this.DataSet.Tables)
+                        this.EnabledTableConstraints(transaction, dataTable);
+
                     transaction.Commit();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine(ex);
                     transaction.Rollback();
+                    throw;
                 }
             }
             cnn.Close();
@@ -107,13 +114,13 @@ namespace apsys.ndbunit.netcore
         /// Enable datatable's constraints
         /// </summary>
         /// <param name="dbTransaction"></param>
-        protected abstract void EnabledTableConstraints(IDbTransaction dbTransaction);
+        protected abstract void EnabledTableConstraints(IDbTransaction dbTransaction, DataTable dataTable);
 
         /// <summary>
         /// Disable datatable's constraints
         /// </summary>
         /// <param name="dbTransaction"></param>
-        protected abstract void DisableTableConstraints(IDbTransaction dbTransaction);
+        protected abstract void DisableTableConstraints(IDbTransaction dbTransaction, DataTable dataTable);
 
     }
 }

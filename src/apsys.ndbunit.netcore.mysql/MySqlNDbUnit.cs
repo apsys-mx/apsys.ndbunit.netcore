@@ -24,12 +24,12 @@ namespace apsys.ndbunit.netcore.mysql
         /// <returns></returns>
         public override DbConnection CreateConnection() => new MySqlConnection(this.ConnectionString);
 
-        protected override void DisableTableConstraints(IDbTransaction dbTransaction)
+        protected override void DisableTableConstraints(IDbTransaction dbTransaction, DataTable dataTable)
         {
             throw new NotImplementedException();
         }
 
-        protected override void EnabledTableConstraints(IDbTransaction dbTransaction)
+        protected override void EnabledTableConstraints(IDbTransaction dbTransaction, DataTable dataTable)
         {
             throw new NotImplementedException();
         }

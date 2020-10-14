@@ -24,14 +24,20 @@ namespace apsys.ndbunit.netcore.sqlserver
         /// <returns></returns>
         public override DbConnection CreateConnection() => new SqlConnection(this.ConnectionString);
 
-        protected override void DisableTableConstraints(IDbTransaction dbTransaction)
+        protected override void DisableTableConstraints(IDbTransaction dbTransaction, DataTable dataTable)
         {
-            throw new NotImplementedException();
+            DbCommand sqlCommand = new SqlCommand("ALTER TABLE " + (dataTable.TableName) + " NOCHECK CONSTRAINT ALL");
+            sqlCommand.Connection = (DbConnection)dbTransaction.Connection;
+            sqlCommand.Transaction = (DbTransaction)dbTransaction;
+            sqlCommand.ExecuteNonQuery();
         }
 
-        protected override void EnabledTableConstraints(IDbTransaction dbTransaction)
+        protected override void EnabledTableConstraints(IDbTransaction dbTransaction, DataTable dataTable)
         {
-            throw new NotImplementedException();
+            DbCommand sqlCommand = new SqlCommand("ALTER TABLE " + (dataTable.TableName) + " CHECK CONSTRAINT ALL");
+            sqlCommand.Connection = (DbConnection)dbTransaction.Connection;
+            sqlCommand.Transaction = (DbTransaction)dbTransaction;
+            sqlCommand.ExecuteNonQuery();
         }
     }
 }
